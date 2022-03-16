@@ -11,10 +11,16 @@ chai.use(chaiAsPromised);
 
 const expect = chai.expect;
 
+require("dotenv").config({ path: "../.env" });
+
 contract("Token Test", async (accounts) => {
   const [deployerAccount, recipient, anotherAccount] = accounts;
+
+  beforeEach(async () => {
+    this.myToken = await Token.new(process.env.INITIAL_TOKENS);
+  });
   it("all tokens should be in my account", async () => {
-    let instance = await Token.deployed();
+    let instance = this.myToken;
     let totalSupply = await instance.totalSupply();
 
     expect(
@@ -24,7 +30,7 @@ contract("Token Test", async (accounts) => {
 
   it("is possible to send tokens between accounts", async () => {
     const sendToken = 1;
-    let instance = await Token.deployed();
+    let instance = this.myToken;
     let totalSupply = await instance.totalSupply();
 
     expect(
@@ -44,7 +50,7 @@ contract("Token Test", async (accounts) => {
 
   it("is not possible to send more tokens than available in total", async () => {
     const sendToken = 1;
-    let instance = await Token.deployed();
+    let instance = this.myToken;
     let balanceOfDeployer = await instance.balanceOf(deployerAccount);
 
     expect(instance.transfer(recipient, new BN(balanceOfDeployer + 1))).to

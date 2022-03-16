@@ -685,7 +685,7 @@
     }
   },
   "schemaVersion": "3.4.6",
-  "updatedAt": "2022-03-16T21:01:39.406Z",
+  "updatedAt": "2022-03-16T21:09:52.485Z",
   "devdoc": {
     "methods": {
       "buyTokens(address)": {
