@@ -7,7 +7,12 @@ import getWeb3 from "./getWeb3";
 import "./App.css";
 
 class App extends Component {
-  state = { loaded: false, kycAddress: "0x123...." };
+  state = {
+    loaded: false,
+    kycAddress: "0x123....",
+    tokenSaleAddress: null,
+    userTokens: 0,
+  };
 
   componentDidMount = async () => {
     try {
@@ -43,7 +48,12 @@ class App extends Component {
 
       // Set web3, accounts, and contract to the state, and then proceed with an
       // example of interacting with the contract's methods.
-      this.setState({ loaded: true });
+      this.listenToTokenTransfer();
+      this.setState({
+        loaded: true,
+        tokenSaleAddress: MyTokenSale.networks[this.networkId].address,
+        userTokens: this.updateUserTokens(),
+      });
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -69,6 +79,26 @@ class App extends Component {
     alert(`KYC for ${this.state.kycAddress} is completed.`);
   };
 
+  updateUserTokens = async () => {
+    let userTokens = await this.tokenInstance.methods
+      .balanceOf(this.accounts[0])
+      .call();
+    this.setState({ userTokens: userTokens });
+  };
+
+  listenToTokenTransfer = () => {
+    this.tokenInstance.events
+      .Trasfer({ this: this.accounts[0] })
+      .on("data", this.updateUserTokens);
+  };
+
+  handleBuyTokens = async () => {
+    await this.tokenSaleInstance.methods.buyTokens(this.accounts[0]).send({
+      from: this.accounts[0],
+      value: this.web3.utils.toWei("2", "wei"),
+    });
+  };
+
   render() {
     if (!this.state.loaded) {
       return <div>Loading Web3, accounts, and contract...</div>;
@@ -87,6 +117,15 @@ class App extends Component {
         />
         <button type="button" onClick={this.handleKycWhitelisting}>
           Add to whitelist
+        </button>
+        <h2>Buy Tokens</h2>
+        <p>
+          If you want to buy tokens, send Wei to this address: <br />
+          <strong>{this.state.tokenSaleAddress}</strong>
+        </p>
+        <p>You currently have: {this.state.userTokens} CAPPU Tokens</p>
+        <button type="button" onClick={this.handleBuyTokens}>
+          Buy more tokens
         </button>
       </div>
     );
