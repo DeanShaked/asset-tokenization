@@ -24,6 +24,23 @@ module.exports = {
         ),
       network_id: 5777,
     },
+    goerli_local: {
+      provider: () =>
+        new HDWalletProvider(
+          process.env.MNEMONIC,
+          "https://goerli.infura.io/v3/6f8f108c5bf44e408d3fb1e9357e2e55",
+          AccountIndex
+        ),
+      network_id: 5,
+    ropsten_local: {
+      provider: () =>
+        new HDWalletProvider(
+          process.env.MNEMONIC,
+          "https://ropsten.infura.io/v3/6f8f108c5bf44e408d3fb1e9357e2e55",
+          AccountIndex
+        ),
+      network_id: 3,
+    },
   },
   compilers: {
     solc: {
